@@ -1,0 +1,619 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Project 1\n",
+    "Adam Ahmed"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 1\n",
+    "Open the sat_scores.csv file.  Investigate the data and answer the following questions:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "What does the data describe?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "    The data shows SAT scores for all 50 states (Verbal and Math) along with the cooresponding participation rates"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Does the data look complete?  Are there any obvious issues with the observations?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "    The data does look complete.  The only issus was editing the abbreviation of Nebraska."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Create a data dictonary for the dataset"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 2\n",
+    "Load the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "import csv\n",
+    "import urllib2\n",
+    "import numpy as np\n",
+    "import matplotlib\n",
+    "import matplotlib.pyplot as pl\n",
+    "import scipy.stats as stats\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Load the data into a list of lists"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "with open ('sat_scores.csv', 'U') as f:\n",
+    "        reader = csv.reader(f)\n",
+    "        scores = list(reader)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Print the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {
+    "collapsed": false,
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[['State', 'Rate', 'Verbal', 'Math'], ['CT', '82', '509', '510'], ['NJ', '81', '499', '513'], ['MA', '79', '511', '515'], ['NY', '77', '495', '505'], ['NH', '72', '520', '516'], ['RI', '71', '501', '499'], ['PA', '71', '500', '499'], ['VT', '69', '511', '506'], ['ME', '69', '506', '500'], ['VA', '68', '510', '501'], ['DE', '67', '501', '499'], ['MD', '65', '508', '510'], ['NC', '65', '493', '499'], ['GA', '63', '491', '489'], ['IN', '60', '499', '501'], ['SC', '57', '486', '488'], ['DC', '56', '482', '474'], ['OR', '55', '526', '526'], ['FL', '54', '498', '499'], ['WA', '53', '527', '527'], ['TX', '53', '493', '499'], ['HI', '52', '485', '515'], ['AK', '51', '514', '510'], ['CA', '51', '498', '517'], ['AZ', '34', '523', '525'], ['NV', '33', '509', '515'], ['CO', '31', '539', '542'], ['OH', '26', '534', '439'], ['MT', '23', '539', '539'], ['WV', '18', '527', '512'], ['ID', '17', '543', '542'], ['TN', '13', '562', '553'], ['NM', '13', '551', '542'], ['IL', '12', '576', '589'], ['KY', '12', '550', '550'], ['WY', '11', '547', '545'], ['MI', '11', '561', '572'], ['MN', '9', '580', '589'], ['KS', '9', '577', '580'], ['AL', '9', '559', '554'], ['NB', '8', '562', '568'], ['OK', '8', '567', '561'], ['MO', '8', '577', '577'], ['LA', '7', '564', '562'], ['WI', '6', '584', '596'], ['AR', '6', '562', '550'], ['UT', '5', '575', '570'], ['IA', '5', '593', '603'], ['SD', '4', '577', '582'], ['ND', '4', '592', '599'], ['MS', '4', '566', '551']]\n"
+     ]
+    }
+   ],
+   "source": [
+    "print scores"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Extract a list of labels from the data, and remove them from the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[['CT', '82', '509', '510'], ['NJ', '81', '499', '513'], ['MA', '79', '511', '515'], ['NY', '77', '495', '505'], ['NH', '72', '520', '516'], ['RI', '71', '501', '499'], ['PA', '71', '500', '499'], ['VT', '69', '511', '506'], ['ME', '69', '506', '500'], ['VA', '68', '510', '501'], ['DE', '67', '501', '499'], ['MD', '65', '508', '510'], ['NC', '65', '493', '499'], ['GA', '63', '491', '489'], ['IN', '60', '499', '501'], ['SC', '57', '486', '488'], ['DC', '56', '482', '474'], ['OR', '55', '526', '526'], ['FL', '54', '498', '499'], ['WA', '53', '527', '527'], ['TX', '53', '493', '499'], ['HI', '52', '485', '515'], ['AK', '51', '514', '510'], ['CA', '51', '498', '517'], ['AZ', '34', '523', '525'], ['NV', '33', '509', '515'], ['CO', '31', '539', '542'], ['OH', '26', '534', '439'], ['MT', '23', '539', '539'], ['WV', '18', '527', '512'], ['ID', '17', '543', '542'], ['TN', '13', '562', '553'], ['NM', '13', '551', '542'], ['IL', '12', '576', '589'], ['KY', '12', '550', '550'], ['WY', '11', '547', '545'], ['MI', '11', '561', '572'], ['MN', '9', '580', '589'], ['KS', '9', '577', '580'], ['AL', '9', '559', '554'], ['NB', '8', '562', '568'], ['OK', '8', '567', '561'], ['MO', '8', '577', '577'], ['LA', '7', '564', '562'], ['WI', '6', '584', '596'], ['AR', '6', '562', '550'], ['UT', '5', '575', '570'], ['IA', '5', '593', '603'], ['SD', '4', '577', '582'], ['ND', '4', '592', '599'], ['MS', '4', '566', '551']]\n"
+     ]
+    }
+   ],
+   "source": [
+    "labels = scores[0]\n",
+    "scores.pop(0)\n",
+    "print scores"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Create a list of State names extracted from the data.  (HINT: Use the list of labels to index the State column)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {
+    "collapsed": false,
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['CT', 'NJ', 'MA', 'NY', 'NH', 'RI', 'PA', 'VT', 'ME', 'VA', 'DE', 'MD', 'NC', 'GA', 'IN', 'SC', 'DC', 'OR', 'FL', 'WA', 'TX', 'HI', 'AK', 'CA', 'AZ', 'NV', 'CO', 'OH', 'MT', 'WV', 'ID', 'TN', 'NM', 'IL', 'KY', 'WY', 'MI', 'MN', 'KS', 'AL', 'NB', 'OK', 'MO', 'LA', 'WI', 'AR', 'UT', 'IA', 'SD', 'ND', 'MS']\n"
+     ]
+    }
+   ],
+   "source": [
+    "first = [item[0] for item in scores]\n",
+    "print first"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Print the types of each column"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<type 'str'>\n",
+      "<type 'str'>\n",
+      "<type 'str'>\n",
+      "<type 'str'>\n"
+     ]
+    }
+   ],
+   "source": [
+    "for item in scores:\n",
+    "    for i in item:\n",
+    "        print type(i)\n",
+    "    break\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Do any types need to be reassigned?  If so, reassign."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[82, 509, 510], [81, 499, 513], [79, 511, 515], [77, 495, 505], [72, 520, 516], [71, 501, 499], [71, 500, 499], [69, 511, 506], [69, 506, 500], [68, 510, 501], [67, 501, 499], [65, 508, 510], [65, 493, 499], [63, 491, 489], [60, 499, 501], [57, 486, 488], [56, 482, 474], [55, 526, 526], [54, 498, 499], [53, 527, 527], [53, 493, 499], [52, 485, 515], [51, 514, 510], [51, 498, 517], [34, 523, 525], [33, 509, 515], [31, 539, 542], [26, 534, 439], [23, 539, 539], [18, 527, 512], [17, 543, 542], [13, 562, 553], [13, 551, 542], [12, 576, 589], [12, 550, 550], [11, 547, 545], [11, 561, 572], [9, 580, 589], [9, 577, 580], [9, 559, 554], [8, 562, 568], [8, 567, 561], [8, 577, 577], [7, 564, 562], [6, 584, 596], [6, 562, 550], [5, 575, 570], [5, 593, 603], [4, 577, 582], [4, 592, 599], [4, 566, 551]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "second = [item[1:] for item in scores]\n",
+    "[[int(y) for y in x] for x in second]\n",
+    "\n",
+    "third = [[int(y) for y in x] for x in second]\n",
+    "print third\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Create a dictionary for each column mapping the state to its respective value for that column"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'AK': ['51', '514', '510'],\n",
+       " 'AL': ['9', '559', '554'],\n",
+       " 'AR': ['6', '562', '550'],\n",
+       " 'AZ': ['34', '523', '525'],\n",
+       " 'CA': ['51', '498', '517'],\n",
+       " 'CO': ['31', '539', '542'],\n",
+       " 'CT': ['82', '509', '510'],\n",
+       " 'DC': ['56', '482', '474'],\n",
+       " 'DE': ['67', '501', '499'],\n",
+       " 'FL': ['54', '498', '499'],\n",
+       " 'GA': ['63', '491', '489'],\n",
+       " 'HI': ['52', '485', '515'],\n",
+       " 'IA': ['5', '593', '603'],\n",
+       " 'ID': ['17', '543', '542'],\n",
+       " 'IL': ['12', '576', '589'],\n",
+       " 'IN': ['60', '499', '501'],\n",
+       " 'KS': ['9', '577', '580'],\n",
+       " 'KY': ['12', '550', '550'],\n",
+       " 'LA': ['7', '564', '562'],\n",
+       " 'MA': ['79', '511', '515'],\n",
+       " 'MD': ['65', '508', '510'],\n",
+       " 'ME': ['69', '506', '500'],\n",
+       " 'MI': ['11', '561', '572'],\n",
+       " 'MN': ['9', '580', '589'],\n",
+       " 'MO': ['8', '577', '577'],\n",
+       " 'MS': ['4', '566', '551'],\n",
+       " 'MT': ['23', '539', '539'],\n",
+       " 'NB': ['8', '562', '568'],\n",
+       " 'NC': ['65', '493', '499'],\n",
+       " 'ND': ['4', '592', '599'],\n",
+       " 'NH': ['72', '520', '516'],\n",
+       " 'NJ': ['81', '499', '513'],\n",
+       " 'NM': ['13', '551', '542'],\n",
+       " 'NV': ['33', '509', '515'],\n",
+       " 'NY': ['77', '495', '505'],\n",
+       " 'OH': ['26', '534', '439'],\n",
+       " 'OK': ['8', '567', '561'],\n",
+       " 'OR': ['55', '526', '526'],\n",
+       " 'PA': ['71', '500', '499'],\n",
+       " 'RI': ['71', '501', '499'],\n",
+       " 'SC': ['57', '486', '488'],\n",
+       " 'SD': ['4', '577', '582'],\n",
+       " 'TN': ['13', '562', '553'],\n",
+       " 'TX': ['53', '493', '499'],\n",
+       " 'UT': ['5', '575', '570'],\n",
+       " 'VA': ['68', '510', '501'],\n",
+       " 'VT': ['69', '511', '506'],\n",
+       " 'WA': ['53', '527', '527'],\n",
+       " 'WI': ['6', '584', '596'],\n",
+       " 'WV': ['18', '527', '512'],\n",
+       " 'WY': ['11', '547', '545']}"
+      ]
+     },
+     "execution_count": 44,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "{t[0]:t[1:] for t in scores}\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 3\n",
+    "Describe the data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Print the min and max of each column"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {
+    "collapsed": false,
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "603\n",
+      "439\n",
+      "593\n",
+      "482\n"
+     ]
+    }
+   ],
+   "source": [
+    "third = [[int(y) for y in x] for x in second]\n",
+    "\n",
+    "\n",
+    "print max(l[2] for l in third)\n",
+    "print min(l[2] for l in third)\n",
+    "\n",
+    "print max(l[1] for l in third)\n",
+    "print min(l[1] for l in third)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Write a function using only list comprehensions, no loops, to compute Standard Deviation. Print the Standard Deviation of each numeric column\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "ename": "TypeError",
+     "evalue": "unsupported operand type(s) for +: 'int' and 'list'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mTypeError\u001b[0m                                 Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-46-91cd0a69effd>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      7\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msqrt\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvariance\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 9\u001b[0;31m \u001b[0;32mprint\u001b[0m \u001b[0mstd_dev\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mthird\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m<ipython-input-46-91cd0a69effd>\u001b[0m in \u001b[0;36mstd_dev\u001b[0;34m(list)\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;31m###THIS CODE IS NOT WORKING!!!\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mstd_dev\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlist\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 5\u001b[0;31m         \u001b[0mmn\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msum\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlist\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m/\u001b[0m\u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlist\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      6\u001b[0m         \u001b[0mvariance\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msum\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0me\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0mmn\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m**\u001b[0m\u001b[0;36m2\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0me\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mlist\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msqrt\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvariance\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mTypeError\u001b[0m: unsupported operand type(s) for +: 'int' and 'list'"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "\n",
+    "###THIS CODE IS NOT WORKING!!!\n",
+    "def std_dev(list):\n",
+    "\tmn = sum(list)/len(list)\n",
+    "\tvariance = sum ([(e-mn)**2 for e in list])\n",
+    "\treturn np.sqrt(variance)\n",
+    "\n",
+    "print std_dev(third)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 4\n",
+    "Visualize the data:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using MatPlotLib and PyPlot, plot the distribution of the Rate using histograms"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "rates = [item[0] for item in second]\n",
+    "rates = [int(i) for i in rates]\n",
+    "print rates\n",
+    "\n",
+    "fit = stats.norm.pdf(rates, np.mean(rates), np.std(rates))  \n",
+    "\n",
+    "pl.plot(rates,fit,'-o')\n",
+    "\n",
+    "pl.hist(rates,normed=True)      \n",
+    "pl.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Plot the Math distribution"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "mathsat = [item[2] for item in second]\n",
+    "mathsat = [int(i) for i in mathsat]\n",
+    "print mathsat\n",
+    "\n",
+    "fit = stats.norm.pdf(mathsat, np.mean(mathsat), np.std(mathsat))  \n",
+    "\n",
+    "pl.plot(mathsat,fit,'-o')\n",
+    "\n",
+    "pl.hist(mathsat,normed=True)      \n",
+    "pl.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Plot the Verbal distribution"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "verbalsat = [item[1] for item in second]\n",
+    "verbalsat = [int(i) for i in verbalsat]\n",
+    "print verbalsat\n",
+    "\n",
+    "fit = stats.norm.pdf(verbalsat, np.mean(verbalsat), np.std(verbalsat))  \n",
+    "\n",
+    "pl.plot(verbalsat,fit,'-o')\n",
+    "\n",
+    "pl.hist(verbalsat,normed=True)      \n",
+    "pl.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "What is the typical assumption for data distribution?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "    In regards to normality, it is said to normally distributed when a theres a 'bell-shaped curve' that is symmetrical on either side of the mean.  "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Does that distribution hold true for our data?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "#I had issues with getting standard deviation to work so my answers are probably off in this area...\n",
+    "    The distribution I think holds more or less true for math and less so for verbal.  This is based off looking at the plots from matplotlib; the verbal data is mostly skewed toward the higher and lower ends."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    " Plot some scatterplots. BONUS: Use a PyPlot figure to present multiple plots at once."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Are there any interesting relationships to note?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "     Clearly the Northern Mid-West of the country has above average Math and Verbal scores.  "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Create box plots for each variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "BONUS: Using Tableau, create a heat map for each variable using a map of the US"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
