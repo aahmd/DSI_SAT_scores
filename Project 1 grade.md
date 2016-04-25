@@ -32,7 +32,7 @@ Good job Adam.
 ---
 
 ## Score:
-Based on the requirements, you can earn a maximum of  **16**  points on this project. Your score is: **#**
+Based on the requirements, you can earn a maximum of  **16**  points on this project. Your score is: **12**
 
 - Remember, your total score is helpful as a gauge of how well you met the project requirements, but use the individual standards and instructor feedback to help iterate and improve on your projects!
 
